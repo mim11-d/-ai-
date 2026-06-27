@@ -1,0 +1,7 @@
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.log
+
+# Local Claude Code settings (keep launch.json + serve.js for local preview)
+.claude/settings.local.json
