@@ -74,7 +74,12 @@ body {
 }
 .hero__sub strong { color: var(--ink); font-weight: 600; }
 
-.hero__actions { display: flex; justify-content: center; }
+.hero__actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
+.hero__hint {
+  margin: 12px 0 0;
+  font-size: 0.76rem;
+  color: var(--ink-faint);
+}
 
 /* ---------- Buttons ---------- */
 .btn {
@@ -84,6 +89,9 @@ body {
   border: none;
   border-radius: 999px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   transition: transform 0.18s var(--ease), background 0.2s var(--ease),
     box-shadow 0.2s var(--ease), color 0.2s var(--ease);
   user-select: none;
@@ -106,6 +114,7 @@ body {
   border: 1px solid var(--line-strong);
 }
 .btn--ghost:hover { background: #fff; color: var(--ink); border-color: #d0d0d0; }
+.btn .ico { width: 14px; height: 14px; flex: none; }
 
 /* ---------- Result ---------- */
 .result { animation: rise 0.5s var(--ease) both; }
@@ -144,6 +153,9 @@ body {
 }
 
 .card__label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.12em;
@@ -151,6 +163,31 @@ body {
   color: var(--ink-faint);
   margin-bottom: 14px;
 }
+
+/* Per-card re-roll button — re-rolls only that dimension */
+.card__reroll {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: background 0.2s var(--ease), color 0.2s var(--ease),
+    border-color 0.2s var(--ease), transform 0.35s var(--ease);
+}
+.card__reroll:hover {
+  background: #fff;
+  color: var(--ink);
+  border-color: #d0d0d0;
+}
+.card__reroll:active { transform: rotate(-180deg); }
+.card__reroll .ico { width: 14px; height: 14px; display: block; }
 
 .card__foot { margin-top: 16px; }
 .card__title {
@@ -317,7 +354,7 @@ body {
 /* ---------- Swatches ---------- */
 .swatches {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   flex: 1;
   min-height: 0;
 }
@@ -329,25 +366,32 @@ body {
   justify-content: flex-end;
   border: none;
   border-radius: 10px;
-  padding: 10px 8px;
-  min-height: 150px;
+  padding: 8px 5px;
+  min-height: 156px;
   overflow: hidden;
   cursor: pointer;
   font-family: "Space Grotesk", sans-serif;
-  font-size: 0.72rem;
   font-weight: 600;
-  letter-spacing: 0.02em;
-  text-align: left;
   transition: transform 0.18s var(--ease), box-shadow 0.18s var(--ease);
   position: relative;
 }
 .swatch:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+/* Full-width bar so the box is never narrower than the HEX text */
 .swatch__hex {
-  background: rgba(255, 255, 255, 0.86);
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.88);
   color: #1a1a1d;
-  padding: 3px 7px;
+  padding: 4px 2px;
   border-radius: 6px;
   backdrop-filter: blur(2px);
+  font-size: 0.64rem;
+  letter-spacing: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ---------- Keywords ---------- */
@@ -361,28 +405,33 @@ body {
 }
 .keywords li {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 12px;
-  padding: 14px 16px;
+  padding: 12px 16px;
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   background: #fafafa;
-  font-size: 1.2rem;
   transition: border-color 0.2s var(--ease), background 0.2s var(--ease);
-}
-/* Keyword text matches the mood typography; the index number stays neutral */
-.keywords li > span:last-child {
-  font-family: var(--mood-font, "Space Grotesk", sans-serif);
-  font-weight: var(--mood-weight, 600);
-  font-style: var(--mood-style, normal);
-  letter-spacing: var(--mood-tracking, -0.01em);
-  text-transform: var(--mood-transform, none);
 }
 .keywords li:hover { border-color: var(--line-strong); background: #fff; }
 .keywords li .num {
   font-size: 0.72rem;
   color: var(--ink-faint);
   font-weight: 600;
+  align-self: flex-start;
+  padding-top: 5px;
+}
+/* word + meaning stacked; word font is set inline per keyword from JS */
+.kw-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.kw { font-size: 1.2rem; line-height: 1.15; }
+.kw-meaning {
+  font-family: "Inter", sans-serif;
+  font-size: 0.78rem;
+  font-weight: 400;
+  font-style: normal;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink-soft);
 }
 
 /* ---------- Footer ---------- */
@@ -391,6 +440,215 @@ body {
   text-align: center;
   font-size: 0.78rem;
   color: var(--ink-faint);
+}
+
+/* ---------- Saved: toggle button ---------- */
+.saved-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 30;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid var(--line-strong);
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.18s var(--ease), box-shadow 0.18s var(--ease);
+}
+.saved-toggle:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.saved-toggle .ico { width: 18px; height: 18px; }
+.saved-toggle__count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* ---------- Saved: overlay + slide-in panel ---------- */
+.saved-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 20, 25, 0.28);
+  opacity: 0;
+  transition: opacity 0.25s var(--ease);
+  z-index: 40;
+}
+.saved-overlay.show { opacity: 1; }
+
+.saved-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(420px, 100vw);
+  background: var(--surface);
+  box-shadow: -8px 0 32px rgba(20, 20, 25, 0.12);
+  z-index: 41;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.3s var(--ease);
+}
+.saved-panel.show { transform: translateX(0); }
+
+.saved-panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 14px 14px 20px;
+  border-bottom: 1px solid var(--line);
+  flex: none;
+}
+.saved-panel__headActions { display: flex; align-items: center; gap: 4px; }
+
+.saved-tabs { display: flex; gap: 2px; }
+.saved-tab {
+  border: none;
+  background: transparent;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink-faint);
+  cursor: pointer;
+  transition: background 0.2s var(--ease), color 0.2s var(--ease);
+}
+.saved-tab:hover { color: var(--ink-soft); }
+.saved-tab.is-active { background: #f2f2f2; color: var(--ink); }
+
+.text-btn {
+  border: none;
+  background: transparent;
+  padding: 6px 8px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--ink-faint);
+  cursor: pointer;
+  transition: color 0.2s var(--ease);
+}
+.text-btn:hover { color: var(--ink); text-decoration: underline; }
+
+.icon-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: background 0.2s var(--ease), color 0.2s var(--ease);
+}
+.icon-btn:hover { background: #f2f2f2; color: var(--ink); }
+.icon-btn .ico { width: 16px; height: 16px; }
+
+.saved-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.saved-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--ink-faint);
+  font-size: 0.85rem;
+  padding: 0 30px;
+  line-height: 1.6;
+  margin: 0;
+}
+/* Both are toggled via the `hidden` attribute from JS; since they also set
+   their own `display`, [hidden] needs an explicit rule to still win. */
+.saved-list[hidden],
+.saved-empty[hidden] { display: none; }
+
+.saved-item {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.2s var(--ease), background 0.2s var(--ease);
+}
+.saved-item:hover { border-color: var(--line-strong); background: #fafafa; }
+.saved-item__strip {
+  flex: none;
+  width: 56px;
+  height: 44px;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+}
+.saved-item__strip span { flex: 1; }
+.saved-item__body { flex: 1; min-width: 0; }
+.saved-item__top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.saved-item__mood {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.saved-item__time { font-size: 0.68rem; color: var(--ink-faint); flex: none; }
+.saved-item__kw {
+  margin-top: 3px;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.saved-item__actions { flex: none; display: flex; gap: 4px; }
+.saved-item__action {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  border-radius: 7px;
+  color: var(--ink-faint);
+  cursor: pointer;
+  transition: background 0.2s var(--ease), color 0.2s var(--ease);
+}
+.saved-item__action:hover { background: #eee; color: var(--ink); }
+.saved-item__action .ico { width: 14px; height: 14px; }
+.saved-item__action--danger:hover { background: #fdeaea; color: #c23434; }
+
+@media (max-width: 560px) {
+  .saved-toggle { width: 40px; height: 40px; top: 14px; right: 14px; }
 }
 
 /* ---------- Toast ---------- */
@@ -424,7 +682,7 @@ body {
 .card--keyword { animation-delay: 0.14s; }
 
 /* ---------- Responsive ---------- */
-@media (max-width: 860px) {
+@media (max-width: 1000px) {
   .grid { grid-template-columns: 1fr 1fr; }
   .card--mood { grid-column: 1 / -1; }
   .mood { aspect-ratio: 16 / 7; }
@@ -434,7 +692,8 @@ body {
   .card--mood { grid-column: auto; }
   .mood { aspect-ratio: 4 / 3; }
   .result__bar { margin-bottom: 14px; }
-  .btn--primary { width: 100%; }
+  .hero__actions { flex-direction: column; align-items: stretch; }
+  .hero__actions .btn { width: 100%; justify-content: center; }
 
   /* Coolors-style: stack swatches into full-width rows so HEX stays legible */
   .swatches { flex-direction: column; gap: 6px; }
@@ -445,6 +704,12 @@ body {
     justify-content: flex-end;
     min-height: 52px;
     padding: 0 12px;
+  }
+  /* rows are wide — let the HEX shrink back to a compact right-aligned pill */
+  .swatch__hex {
+    width: auto;
+    padding: 4px 8px;
+    font-size: 0.74rem;
   }
 }
 

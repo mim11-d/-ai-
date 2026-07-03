@@ -17,7 +17,52 @@
       <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" />
       <feColorMatrix type="saturate" values="0" />
     </filter>
+    <symbol id="ico-reroll" viewBox="0 0 24 24">
+      <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="23 4 23 10 17 10" />
+        <polyline points="1 20 1 14 7 14" />
+        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+      </g>
+    </symbol>
+    <symbol id="ico-bookmark" viewBox="0 0 24 24">
+      <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+        d="M6 3.5h12a.5.5 0 0 1 .5.5v16.5l-7-4-7 4V4a.5.5 0 0 1 .5-.5Z" />
+    </symbol>
+    <symbol id="ico-close" viewBox="0 0 24 24">
+      <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="6" y1="6" x2="18" y2="18" />
+        <line x1="18" y1="6" x2="6" y2="18" />
+      </g>
+    </symbol>
+    <symbol id="ico-copy" viewBox="0 0 24 24">
+      <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="9" y="9" width="12" height="12" rx="2" />
+        <path d="M5 15V5a2 2 0 0 1 2-2h10" />
+      </g>
+    </symbol>
+    <symbol id="ico-trash" viewBox="0 0 24 24">
+      <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 7h16" />
+        <path d="M9 7V4.5A1.5 1.5 0 0 1 10.5 3h3A1.5 1.5 0 0 1 15 4.5V7" />
+        <path d="M6 7l1 13.5A1.5 1.5 0 0 0 8.5 22h7a1.5 1.5 0 0 0 1.5-1.5L18 7" />
+        <path d="M10 11v6" />
+        <path d="M14 11v6" />
+      </g>
+    </symbol>
+    <symbol id="ico-image" viewBox="0 0 24 24">
+      <g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="4" width="18" height="16" rx="2" />
+        <circle cx="8.5" cy="9.5" r="1.5" />
+        <path d="M21 15l-5-5-9 9" />
+      </g>
+    </symbol>
   </svg>
+
+  <button id="openSaved" class="saved-toggle" type="button"
+    title="저장·기록 보기" aria-haspopup="dialog" aria-controls="savedPanel">
+    <svg class="ico" aria-hidden="true"><use href="#ico-bookmark" /></svg>
+    <span id="savedCount" class="saved-toggle__count" hidden>0</span>
+  </button>
 
   <main class="app">
     <header class="hero">
@@ -33,25 +78,38 @@
         <button id="generate" class="btn btn--primary" type="button">
           Generate Inspiration
         </button>
+        <button id="uploadPhotoBtn" class="btn btn--ghost" type="button"
+          title="사진을 업로드하면 그 사진의 색감으로 무드·팔레트·키워드를 만들어요">
+          <svg class="ico" aria-hidden="true"><use href="#ico-image" /></svg>
+          Photo
+        </button>
+        <input id="photoInput" type="file" accept="image/*" hidden />
       </div>
+      <p class="hero__hint">사진은 브라우저 안에서만 분석돼요. 업로드나 서버 전송 없음.</p>
     </header>
 
     <section id="result" class="result" aria-live="polite" hidden>
       <div class="result__bar">
         <span class="result__index" id="resultIndex">Set 01</span>
         <div class="result__tools">
-          <button id="recolor" class="btn btn--ghost" type="button"
-            title="무드·키워드는 그대로, 같은 분위기의 새로운 컬러를 다시 뽑습니다">Recolor</button>
-          <button id="regenerate" class="btn btn--ghost" type="button"
-            title="완전히 새로운 무드·컬러·키워드 세트를 뽑습니다">Regenerate</button>
-          <button id="copy" class="btn btn--ghost" type="button">Copy</button>
+          <button id="save" class="btn btn--ghost" type="button"
+            title="이 조합을 저장해서 나중에 다시 볼 수 있어요">
+            <svg class="ico" aria-hidden="true"><use href="#ico-bookmark" /></svg>
+            Save
+          </button>
         </div>
       </div>
 
       <div class="grid">
         <!-- MOOD -->
         <article class="card card--mood">
-          <div class="card__label">Mood</div>
+          <div class="card__label">
+            <span>Mood</span>
+            <button id="rerollMood" class="card__reroll" type="button"
+              title="이 무드만 새로 뽑기 (컬러·키워드 유지)" aria-label="무드 새로고침">
+              <svg class="ico" aria-hidden="true"><use href="#ico-reroll" /></svg>
+            </button>
+          </div>
           <div class="mood" id="moodVisual" aria-hidden="true">
             <div class="mood__grain"></div>
           </div>
@@ -63,7 +121,13 @@
 
         <!-- COLOR -->
         <article class="card card--color">
-          <div class="card__label">Color Palette</div>
+          <div class="card__label">
+            <span>Color Palette</span>
+            <button id="rerollColor" class="card__reroll" type="button"
+              title="같은 분위기의 새 컬러만 다시 뽑기" aria-label="컬러 새로고침">
+              <svg class="ico" aria-hidden="true"><use href="#ico-reroll" /></svg>
+            </button>
+          </div>
           <div class="swatches" id="swatches"></div>
           <div class="card__foot">
             <p class="card__desc">탭하면 HEX가 복사됩니다.</p>
@@ -72,7 +136,13 @@
 
         <!-- KEYWORD -->
         <article class="card card--keyword">
-          <div class="card__label">Keywords</div>
+          <div class="card__label">
+            <span>Keywords</span>
+            <button id="rerollKeyword" class="card__reroll" type="button"
+              title="키워드 3개만 새로 뽑기" aria-label="키워드 새로고침">
+              <svg class="ico" aria-hidden="true"><use href="#ico-reroll" /></svg>
+            </button>
+          </div>
           <ul class="keywords" id="keywords"></ul>
           <div class="card__foot">
             <p class="card__desc">컨셉을 풀어갈 출발 단어 세 개.</p>
@@ -85,6 +155,26 @@
       <span>Pure HTML · CSS · JS — no dependencies, no server.</span>
     </footer>
   </main>
+
+  <div id="savedOverlay" class="saved-overlay" hidden></div>
+  <aside id="savedPanel" class="saved-panel" hidden aria-label="저장·기록 목록">
+    <div class="saved-panel__head">
+      <div class="saved-tabs" role="tablist">
+        <button id="tabSaved" class="saved-tab is-active" type="button" role="tab" aria-selected="true">Saved</button>
+        <button id="tabHistory" class="saved-tab" type="button" role="tab" aria-selected="false">History</button>
+      </div>
+      <div class="saved-panel__headActions">
+        <button id="clearHistory" class="text-btn" type="button" hidden>지우기</button>
+        <button id="closeSaved" class="icon-btn" type="button" aria-label="닫기">
+          <svg class="ico" aria-hidden="true"><use href="#ico-close" /></svg>
+        </button>
+      </div>
+    </div>
+    <div id="savedList" class="saved-list"></div>
+    <p id="savedEmpty" class="saved-empty">아직 저장한 조합이 없어요.<br />마음에 드는 조합에서 Save를 눌러보세요.</p>
+    <div id="historyList" class="saved-list" hidden></div>
+    <p id="historyEmpty" class="saved-empty" hidden>아직 생성 기록이 없어요.<br />Generate Inspiration을 눌러보세요.</p>
+  </aside>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
